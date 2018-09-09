@@ -1,15 +1,15 @@
 # fc2
 Flight Controller 2 - The brains of the RockIEEE model rocket.
 
-## Wiring:
+### Wiring:
 
-### GY-87 Module:
+#### GY-87 Module:
 - VCC to 3.3V
 - GND to GND
 - SCL to Analog 5
 - SDA to Analog 4
 
-### SD Module:
+#### SD Module:
 - VCC to 5V
 - GND to GND
 - CS to Digital 10
