@@ -4,7 +4,7 @@
 #include <MPU6050_tockn.h>
 
 #define SEPERATION_VELOCITY 0.3
-#define PARACHUTE_ALTITUDE 600
+#define PARACHUTE_ALTITUDE 25
 
 #define BAUD_RATE 9600
 #define SD_PORT 10
@@ -38,7 +38,7 @@ void setup()
     logFile = SD.open("FLT_LOG.BIN", FILE_WRITE);
     logFile.print("\n--------------------\nFlight data:\nbasePressure = ");
     logFile.print(basePressure);
-    logFile.print("\baseAcceleration = ");
+    logFile.print("\nbaseAcceleration = ");
     logFile.print(baseAcceleration);
     logFile.print("\ngyroOffset = [");
     logFile.print(mpu.getGyroXoffset());
@@ -49,43 +49,59 @@ void setup()
     logFile.print("]\n");
     logFile.print("Everything after this is binary data.\n--------------------\n");
     logFile.flush();
+
+    Serial.print("\n--------------------\nFlight data:\nbasePressure = ");
+    Serial.print(basePressure);
+    Serial.print("\nbaseAcceleration = ");
+    Serial.print(baseAcceleration);
+    Serial.print("\ngyroOffset = [");
+    Serial.print(mpu.getGyroXoffset());
+    Serial.print(", ");
+    Serial.print(mpu.getGyroYoffset());
+    Serial.print(", ");
+    Serial.print(mpu.getGyroZoffset());
+    Serial.print("]\n");
+    Serial.print("Everything after this is binary data.\n--------------------\n");
 }
 
 bool stageSeperated = false;
 bool parachuteDeployed = false;
 bool inFlight = false;
-float lastAltitudeLowered = 0;
+float lastAltitudes[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void loop()
 {
-    float altitudeATL = bmp.readAltitude(basePressure);
-    if (altitudeATL < 15 && !inFlight)
+    float altitude = bmp.readAltitude(basePressure);
+    if (altitude < 15 && !inFlight)
     {
         return;
     }
-    bool inFlight = true;
-    Serial.println("Flight started");
+    inFlight = true;
 
     mpu.update();
     float accX = mpu.getAccX();
     float accY = mpu.getAccY();
     float accZ = mpu.getAccZ();
     float acceleration = pow(square(accX) + square(accY) + square(accZ), 0.5) - baseAcceleration;
-    Serial.print("altitudeATL=");
-    Serial.print(altitudeATL);
+    Serial.print("altitude=");
+    Serial.print(altitude);
     Serial.print("\t\tacceleration=");
     Serial.print(acceleration);
     Serial.print("\n");
 
-    if (!stageSeperated && acceleration < SEPERATION_VELOCITY && altitudeATL < lastAltitudeLowered)
+    // TODO: Get lastAltitudes avg and compare it to lastAltitude
+    if (!stageSeperated && acceleration < SEPERATION_VELOCITY && lastAltitude > altitude)
     {
+        Serial.println("Seperating stage 2");
         // TODO: Seperate stage 2
         stageSeperated = true;
     }
-    lastAltitudeLowered = altitudeATL - 4;
+    // TODO: Push & shift to lastAltitudes
+    lastAltitude = altitude;
 
-    if (!parachuteDeployed && stageSeperated && altitudeATL < PARACHUTE_ALTITUDE)
+    if (!parachuteDeployed && stageSeperated && altitude < PARACHUTE_ALTITUDE)
     {
+        Serial.println("Deploying parachute");
         // TODO: Deploy parachute
         parachuteDeployed = true;
     }
@@ -97,7 +113,7 @@ void loop()
 
     uint8_t buf[34];
     memcpy(&buf[0], &currentTime, 4);
-    memcpy(&buf[4], &altitudeATL, 4);
+    memcpy(&buf[4], &altitude, 4);
     memcpy(&buf[8], &accX, 4);
     memcpy(&buf[12], &accY, 4);
     memcpy(&buf[16], &accZ, 4);
