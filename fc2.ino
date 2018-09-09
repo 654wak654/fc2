@@ -49,19 +49,6 @@ void setup()
     logFile.print("]\n");
     logFile.print("Everything after this is binary data.\n--------------------\n");
     logFile.flush();
-
-    Serial.print("\n--------------------\nFlight data:\nbasePressure = ");
-    Serial.print(basePressure);
-    Serial.print("\nbaseAcceleration = ");
-    Serial.print(baseAcceleration);
-    Serial.print("\ngyroOffset = [");
-    Serial.print(mpu.getGyroXoffset());
-    Serial.print(", ");
-    Serial.print(mpu.getGyroYoffset());
-    Serial.print(", ");
-    Serial.print(mpu.getGyroZoffset());
-    Serial.print("]\n");
-    Serial.print("Everything after this is binary data.\n--------------------\n");
 }
 
 bool stageSeperated = false;
