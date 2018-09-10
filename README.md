@@ -1,5 +1,5 @@
 # fc2
-Flight Controller 2 - The brains of the RockIEEE model rocket.
+Flight Controller 2 - The brains of the RockIEEE model rocket. Built on an arduino nano using the following modules and libraries.
 
 ### Wiring:
 
