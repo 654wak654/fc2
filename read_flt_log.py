@@ -14,6 +14,7 @@
 import struct
 
 flightConfig = "E:/FLT_LOG.BIN"
+# TODO: Also write a reader in arduino so data can be read without removing sd card
 
 
 def getf(handle):

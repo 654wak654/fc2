@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,9 @@
 #include <Adafruit_BMP085.h>
 #include <MPU6050_tockn.h>
 
-#define SEPERATION_ACCELERATION 0.2
-#define PARACHUTE_ALTITUDE 25
+#define SEPERATION_ACCELERATION 0.15
+#define ALTITUDE_DELTA 1.0
+#define PARACHUTE_ALTITUDE 30.0
 
 #define DEBUG 1
 #define BAUD_RATE 9600
@@ -140,7 +141,7 @@ void loop()
     }
     avgOfLastAltitudes /= 5;
 
-    if (!stageSeperated && acceleration < SEPERATION_ACCELERATION && altitude < avgOfLastAltitudes)
+    if (!stageSeperated && acceleration < SEPERATION_ACCELERATION && avgOfLastAltitudes - altitude > ALTITUDE_DELTA)
     {
 #ifdef DEBUG
         Serial.println("Seperating stage 2");
@@ -163,10 +164,4 @@ void loop()
         // TODO: Deploy parachute
         parachuteDeployed = true;
     }
-
-#ifdef DEBUG
-    unsigned long lastTime = millis();
-    Serial.print("loop time: ");
-    Serial.println(lastTime - curTime);
-#endif
 }
